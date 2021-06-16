@@ -4,6 +4,11 @@ set -eu
 
 tmpdir="$(mktemp -d)"
 
+test -f "${1:-}" || {
+  echo "markatzea <file>" >&2
+  exit 1
+}
+
 csplit -s \
   --prefix="$tmpdir/$1." --suffix-format='%03d.part' \
   "$1" '/^```/' {*}
@@ -11,19 +16,26 @@ csplit -s \
 ls "$tmpdir/$1".*.part | while read -r file; do
   read -r lang comm < "$file"
 
+  IFS='# ' read -r _ script_alias < "$file"
+
+  # echo "goody-bag: $baba"
+
   [[ $lang != \`\`\`* ]] || [[ -z "$comm" ]] || {
+    echo "spawn: $comm" >&2
     cat "$file"
     echo '```'
     echo '```' # output
     printf '$ ... | %s\n' "$comm"
-    tail -n +2 "$file" | eval "$comm" 2>&1 ||
-      printf '$ echo "exit code: $?"\nexit code: %s\n' "$?"
+    tail -n +2 "$file" | eval "$comm" || {
+      ec="$?"
+      printf '$ echo "exit code: $?"\nexit code: %s\n' "$ec"
+      echo "error: $ec" >&2
+    }
 
     continue
   }
 
   cat "$file"
-
 done
 
 rm -r "$tmpdir"
