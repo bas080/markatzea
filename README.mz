@@ -1,0 +1,114 @@
+# markatzea
+
+TODO
+- Replace placeholder with output of code block
+  - https://unix.stackexchange.com/questions/49377/substitute-pattern-within-a-file-with-the-content-of-other-file
+
+
+Markatzea enhances your markdown by running your code-blocks and printing out
+the output of those commands.
+
+It should/does not break your existing markdown. It adds a little syntax for
+defining the interpreter for that code block. This is defined after the
+code-block's language name. The code-block is then passed as stdin into the
+interpreter configured for that code-block.
+
+## Examples
+
+### Hello Bash
+
+```bash bash
+echo 'hello bash'
+```
+
+### Hello Python
+
+```python python
+print('hello python')
+```
+
+### Hello Javascript
+
+You can use `node -p` to print the value of the last js expression. No need to
+write `console.log(...)`.
+
+```js node -p
+'hello javascript'
+```
+
+### Hello Perl
+
+```perl perl
+print("hello perl\n")
+```
+
+### Hello Lua
+
+```lua luajit
+print("hello lua")
+```
+
+You get the hello idea. Now for a process that exits with an error.
+
+### Write code to a file
+
+```bash tee ./example_tmp_file
+temporary file contents
+```
+
+Check if the temp file exists and has the desired content.
+
+```bash bash
+cat ./example_tmp_file
+```
+
+Cleanup the tmp directory
+
+```bash bash
+rm -v ./example_tmp_file
+```
+
+### Pipeline
+
+```bash bash | bash
+echo 'echo pipeline'
+```
+
+### Non zero exitcode
+
+```bash bash
+print_hello_and_error() {
+  echo hello
+  some_command_that_does_not_exist
+  return 42
+}
+
+print_hello_and_error
+```
+
+It will print stdout and stderr and shows the exit code by acting as if it ran
+`echo $?`. Let's see that again.
+
+```node node
+throw new Error('Something unexpected happened.')
+```
+
+### No output
+
+```node node
+process.exit(0)
+```
+
+### Code block aliases
+
+```node cat # always
+const always = x => () => x
+```
+
+```node node -p
+# always
+
+const 42 = always(42)
+
+42()
+```

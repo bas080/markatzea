@@ -1,0 +1,29 @@
+#!/bin/bash
+
+set -eu
+
+tmpdir="$(mktemp -d)"
+
+csplit -s \
+  --prefix="$tmpdir/$1." --suffix-format='%03d.part' \
+  "$1" '/^```/' {*}
+
+ls "$tmpdir/$1".*.part | while read -r file; do
+  read -r lang comm < "$file"
+
+  [[ $lang != \`\`\`* ]] || [[ -z "$comm" ]] || {
+    cat "$file"
+    echo '```'
+    echo '```' # output
+    printf '$ ... | %s\n' "$comm"
+    tail -n +2 "$file" | eval "$comm" 2>&1 ||
+      printf '$ echo "exit code: $?"\nexit code: %s\n' "$?"
+
+    continue
+  }
+
+  cat "$file"
+
+done
+
+rm -r "$tmpdir"
