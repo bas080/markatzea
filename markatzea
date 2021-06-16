@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use IPC::Open2;
+use List::Util qw(max);
+use List::MoreUtils qw(pairwise);
+use Getopt::Long 2.49 qw(:config auto_help);
+use File::Temp qw(tempfile);
+
+=head1 NAME
+
+markatzea - evaluate your markdown code blocks
+
+=head1 SYNOPSIS
+
+colcise <file>
+
+=cut
+
+=head1 DESCRIPTION
+
+B<colcise> is a tool which takes markdown, evaluates code blocks with
+interpreters and prints the output of those processes to a different codeblock.
+
+=cut
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d, --option>=<option-value>
+
+Option description
+
+=back
+
+=cut
+
+while (my $line = <>) {
+  chomp($line);
+
+  my @parts;
+  my $output;
+  my $in;
+  my $out;
+  my $pid;
+
+  print $line . "\n";
+
+  if ($line =~ /^```/) {
+    @parts = split(/\s+/, $line, 2);
+
+    if (not exists($parts[1])) {
+      next;
+    }
+
+    my $pid = open2($out, $in, $parts[1]);
+
+    while ($line = <>) {
+      print $line;
+
+      if ($line =~ /^```/) {
+        close($in);
+        last;
+      }
+
+      print $in $line;
+    }
+
+    # Do not print output if it is empty.
+    if (eof $out) {
+      next;
+    }
+
+    print "```\n";
+    while ($line = <$out>) {
+      print $line;
+    }
+    print "```\n";
+
+    # Wait for process to finish.
+    waitpid( $pid, 0 );
+    my $child_exit_status = $? >> 8;
+
+    # Exit if a script exits with non zero code.
+    if ($child_exit_status ne 0) {
+      print "$parts[1] exited with code $child_exit_status\n";
+      exit $?;
+    }
+  }
+}
