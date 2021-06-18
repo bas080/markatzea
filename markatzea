@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eu
 
@@ -21,15 +21,21 @@ ls "$tmpdir/$1".*.part | while read -r file; do
   # echo "goody-bag: $baba"
 
   [[ $lang != \`\`\`* ]] || [[ -z "$comm" ]] || {
-    echo "spawn: $comm" >&2
+    # echo "info: $comm" >&2
+    printf '> `%s`\n\n' "$comm"
     cat "$file"
     echo '```'
     echo '```' # output
-    printf '$ ... | %s\n' "$comm"
+    # TODO: do not write output codeblock when empty.
     tail -n +2 "$file" | eval "$comm" || {
       ec="$?"
-      printf '$ echo "exit code: $?"\nexit code: %s\n' "$ec"
-      echo "error: $ec" >&2
+      {
+        printf "error: The following script exited with exit code %s.\n" "$ec"
+        cat "$file"
+        echo '```'
+        echo 'Use "<interpreter> || true" to allow failure.\n'
+      } >&2
+      exit "$ec"
     }
 
     continue

@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie;
+
+# Use an env var to scope the templates
+
+if ($ARGV[0]) {
+  open my $fh, '>', "/tmp/memplate/$ARGV[0]";
+  print $fh <STDIN>;
+  exit;
+}
+
+sub weave {
+  my ($prepend, $fh) = @_;
+
+  while (my $line = <$fh>) {
+    chomp($line);
+
+    my @spl = split(/\</, $line);
+
+    if (exists($spl[1])) {
+      open my $fhn, '<', "/tmp/memplate/$spl[1]";
+      weave($prepend . $spl[0], $fhn);
+      next;
+    }
+
+    print $prepend . $line . "\n";
+  }
+
+  close $fh;
+}
+
+weave("", \*STDIN);

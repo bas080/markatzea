@@ -1,5 +1,10 @@
 # markatzea
 
+TODO
+- Replace placeholder with output of code block
+  - https://unix.stackexchange.com/questions/49377/substitute-pattern-within-a-file-with-the-content-of-other-file
+
+
 Markatzea enhances your markdown by running your code-blocks and printing out
 the output of those commands.
 
@@ -22,13 +27,22 @@ interpreter configured for that code-block.
 ```bash bash
 echo 'hello bash'
 ```
+```
+hello bash
+```
 
 ```python python
 print('hello python')
 ```
+```
+hello python
+```
 
 ```js node -p
 'hello javascript'
+```
+```
+hello javascript
 ```
 > You can use `node -p` to print the value of the last js expression. No need to
 > write `console.log(...)`.
@@ -36,27 +50,39 @@ print('hello python')
 ```perl perl
 print("hello perl\n")
 ```
+```
+hello perl
+```
 
 ```lua luajit
 print("hello lua")
 ```
+```
+hello lua
+```
 
-Write to file without writing to stdout.
+> Write to file without writing to stdout.
 
 ```c cat - > ./hello-world.c
 #include <stdio.h>
 
 int main() {
-   printf("Hello World!\n");
+   printf("Hello World!");
    return 0;
 }
 ```
+```
+```
 
-```bash bash 2>&1
+```bash bash
 gcc -o ./hello-world.out ./hello-world.c
-chmod -v +x ./hello-world.out
+chmod +x ./hello-world.out
 ./hello-world.out
 rm -v ./hello-world.*
+```
+```
+Hello World!removed './hello-world.c'
+removed './hello-world.out'
 ```
 
 You get the hello world idea. Now for some other examples.
@@ -68,17 +94,26 @@ We'll use `tee` for this example.
 ```bash tee ./example_tmp_file
 temporary file contents
 ```
+```
+temporary file contents
+```
 
 Check if the temporary file has the desired content.
 
 ```bash bash
 cat ./example_tmp_file
 ```
+```
+temporary file contents
+```
 
 Remove the temporary file.
 
 ```bash bash
 rm -v ./example_tmp_file
+```
+```
+removed './example_tmp_file'
 ```
 
 ### Oneliners
@@ -90,15 +125,24 @@ A pipeline:
 ```bash bash | bash
 echo 'echo pipeline'
 ```
+```
+pipeline
+```
 
 ```bash bash || true
 exit 1
+```
+```
 ```
 
 > Process exits with zero because of `|| true`.
 
 ```bash cat - && echo world
 hello
+```
+```
+hello
+world
 ```
 
 Markatzea allows you to write long oneliners which are used as the
@@ -118,19 +162,44 @@ print_hello_and_error() {
 
 print_hello_and_error
 ```
+```
+hello
+main: line 3: some_command_that_does_not_exist: command not found
+```
 
 > Notice that we redirect stderr to stdout. This is usefull whenever we want to
 > demo not just the stdout but also the stderr output.
 
+It will print stdout and stderr and shows the exit code by acting as if it ran
+`echo $?`. Let's see that again.
 
 ```node node 2>&1 || true
 throw new Error('Something unexpected happened.')
+```
+```
+[stdin]:1
+throw new Error('Something unexpected happened.')
+^
+
+Error: Something unexpected happened.
+    at [stdin]:1:7
+    at Script.runInThisContext (node:vm:131:12)
+    at Object.runInThisContext (node:vm:308:38)
+    at node:internal/process/execution:81:19
+    at [stdin]-wrapper:6:22
+    at evalScript (node:internal/process/execution:80:60)
+    at node:internal/main/eval_stdin:29:5
+    at Socket.<anonymous> (node:internal/process/execution:209:5)
+    at Socket.emit (node:events:377:35)
+    at endReadableNT (node:internal/streams/readable:1312:12)
 ```
 
 ### No output
 
 ```node node
 process.exit(0)
+```
+```
 ```
 
 ### Creating a script file and running it
@@ -143,9 +212,16 @@ it.
 
 echo hello world
 ```
+```
+#!/usr/bin/env bash
+
+echo hello world
+```
 
 ```bash bash
 chmod +x ./hello-world.sh
+```
+```
 ```
 
 Test if the script works as expected.
@@ -155,50 +231,25 @@ test "$(./hello-world.sh)" = "hello world" &&
   echo "ok" &&
   rm -v ./hello-world.sh
 ```
+```
+ok
+removed './hello-world.sh'
+```
 
 ### Code block aliases
 
-Markatzea does not solve templating itself. We enable templating by using
-a cli templating tool named `memplate`. You can find it here: TODO
-
-We'll write a little node program to showcase using markatzea with `memplate`.
-
-First the modules the program depends on:
-
-```node memplate assert-import
-const assert = require('assert')
+```node cat # always
+const always = x => () => x
 ```
-
-Next is a helper function:
-
-```node memplate always-fn
+```
 const always = x => () => x
 ```
 
-And finally a test.
+```node node -p
+# always
 
-```node memplate result
-<assert-import
+const 42 = always(42)
 
-<always-fn
-
-const fourtyTwo = always(42)
-
-assert.equal(fourtyTwo(), 42)
-assert.equal(fourtyTwo(), 43)
+42()
 ```
-
-Let's see the result
-
-```node memplate
-<result
 ```
-
-We can run the program by piping the output of memplate to node.
-
-```bash memplate | node 2>&1 || true
-<result
-```
-
-By combining memplate and markatzea we can now split our code into readable
-blocks and glue them together at a later moment in time.
