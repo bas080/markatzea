@@ -4,10 +4,26 @@ use strict;
 use warnings;
 use autodie;
 
-# Use an env var to scope the templates
+my $tmp_dir="/tmp/memplate";
+
+-e "$tmp_dir" or mkdir $tmp_dir;
+
+if (exists($ENV{'SCOPE'})) {
+  -e "$tmp_dir/$ENV{'SCOPE'}" or mkdir "$tmp_dir/$ENV{'SCOPE'}";
+}
+
+sub alias_file_path {
+  my ($alias) = @_;
+
+  if (exists($ENV{'SCOPE'})) {
+    return "$tmp_dir/$ENV{'SCOPE'}/$alias";
+  }
+
+  return "/$tmp_dir/$alias";
+}
 
 if ($ARGV[0]) {
-  open my $fh, '>', "/tmp/memplate/$ARGV[0]";
+  open my $fh, '>', alias_file_path($ARGV[0]);
   print $fh <STDIN>;
   exit;
 }
@@ -21,7 +37,7 @@ sub weave {
     my @spl = split(/\</, $line);
 
     if (exists($spl[1])) {
-      open my $fhn, '<', "/tmp/memplate/$spl[1]";
+      open my $fhn, '<', alias_file_path($spl[1]);
       weave($prepend . $spl[0], $fhn);
       next;
     }
