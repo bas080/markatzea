@@ -16,21 +16,21 @@ csplit -s \
 ls "$tmpdir/$1".*.part | while read -r file; do
   read -r lang comm < "$file"
 
-  IFS='# ' read -r _ script_alias < "$file"
+  cat $file
 
-  # echo "goody-bag: $baba"
+  tmp="$(mktemp)"
 
-  [[ $lang != \`\`\`* ]] || [[ -z "$comm" ]] || {
-    # echo "info: $comm" >&2
-    printf '> `%s`\n\n' "$comm"
-    cat "$file"
-    echo '```'
-    echo '```' # output
-    # TODO: do not write output codeblock when empty.
-    tail -n +2 "$file" | eval "$comm" || {
+  # [[ $lang != \`\`\` ]] || {
+  #   printf '```\n`%s`\n' "$comm"
+  # }
+
+  [[ $lang != \`\`\`* ]] || {
+
+    [[ -z "$comm" ]] || tail -n +2 "$file" | eval "$comm" > "$tmp" || {
       ec="$?"
       {
         printf "error: The following script exited with exit code %s.\n" "$ec"
+        cat "$tmp"
         cat "$file"
         echo '```'
         echo 'Use "<interpreter> || true" to allow failure.\n'
@@ -38,10 +38,14 @@ ls "$tmpdir/$1".*.part | while read -r file; do
       exit "$ec"
     }
 
-    continue
+    # printf '```\n`%s`\n```\n' "$comm"
+    test ! -s "$tmp" || {
+      printf '```\n```\n' "$comm"
+      cat "$tmp"
+    }
+
   }
 
-  cat "$file"
 done
 
-rm -r "$tmpdir"
+rm -r "$tmpdir" # TODO: Perform in exit trap.
