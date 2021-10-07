@@ -15,6 +15,10 @@ interpreter configured for that code-block.
 - Writing code blocks or the output of evaluation to files.
 - Use what you know about bash to enable all kinds of features.
 
+## Requirements
+
+Markatzea requires bash and some common utilities to run.
+
 ## Examples
 
 ### Hello World
@@ -41,7 +45,7 @@ print("hello perl\n")
 print("hello lua")
 ```
 
-Write to file without writing to stdout.
+Here we have the hello world c program:
 
 ```c cat - > ./hello-world.c
 #include <stdio.h>
@@ -51,6 +55,9 @@ int main() {
    return 0;
 }
 ```
+
+Before we can run this program we must first compile it and then we clean it
+up.
 
 ```bash bash 2>&1
 gcc -o ./hello-world.out ./hello-world.c
@@ -123,13 +130,13 @@ print_hello_and_error
 > demo not just the stdout but also the stderr output.
 
 
-```node node 2>&1 || true
+```js node 2>&1 || true
 throw new Error('Something unexpected happened.')
 ```
 
 ### No output
 
-```node node
+```js node
 process.exit(0)
 ```
 
@@ -145,7 +152,7 @@ echo hello world
 ```
 
 ```bash bash
-chmod +x ./hello-world.sh
+chmod -v +x ./hello-world.sh
 ```
 
 Test if the script works as expected.
@@ -165,22 +172,19 @@ We'll write a little node program to showcase using markatzea with `memplate`.
 
 First the modules the program depends on:
 
-```node memplate assert-import
+```js memplate assert-import
 const assert = require('assert')
 ```
 
 Next is a helper function:
 
-```node memplate always-fn
+```js memplate always-fn
 const always = x => () => x
 ```
 
 And finally a test.
 
-```node memplate result
-<assert-import
-
-<always-fn
+```js memplate always-fn-test
 
 const fourtyTwo = always(42)
 
@@ -190,7 +194,13 @@ assert.equal(fourtyTwo(), 43)
 
 Let's see the result
 
-```node memplate
+```js memplate result
+<assert-import
+<always-fn
+<always-fn-test
+```
+
+```js memplate
 <result
 ```
 

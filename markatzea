@@ -49,3 +49,4 @@ ls "$tmpdir/$1".*.part | while read -r file; do
 done
 
 rm -r "$tmpdir" # TODO: Perform in exit trap.
+
