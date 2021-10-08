@@ -38,24 +38,24 @@ Option description
 =cut
 
 while (my $line = <>) {
-  chomp($line);
-
   my @parts;
   my $output;
   my $in;
   my $out;
   my $pid;
+  my $comm;
 
-  print $line . "\n";
+  print $line;
 
   if ($line =~ /^```/) {
     @parts = split(/\s+/, $line, 2);
+    $parts[1] =~ s/\s+$//;
 
-    if (not exists($parts[1])) {
+    if ($parts[1] eq "") {
       next;
     }
 
-    my $pid = open2($out, $in, $parts[1]);
+    $pid = open2($out, $in, $parts[1]);
 
     while ($line = <>) {
       print $line;
@@ -69,15 +69,13 @@ while (my $line = <>) {
     }
 
     # Do not print output if it is empty.
-    if (eof $out) {
-      next;
+    if (not eof $out) {
+      print "```\n";
+      while ($line = <$out>) {
+        print $line;
+      }
+      print "```\n";
     }
-
-    print "```\n";
-    while ($line = <$out>) {
-      print $line;
-    }
-    print "```\n";
 
     # Wait for process to finish.
     waitpid( $pid, 0 );
@@ -86,7 +84,7 @@ while (my $line = <>) {
     # Exit if a script exits with non zero code.
     if ($child_exit_status ne 0) {
       print "$parts[1] exited with code $child_exit_status\n";
-      exit $?;
+      exit $child_exit_status;
     }
   }
 }

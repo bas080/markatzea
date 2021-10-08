@@ -8,18 +8,38 @@ defining the interpreter for that code block. This is defined after the
 code-block's language name. The code-block is then passed as stdin into the
 interpreter configured for that code-block.
 
-## Features
+## Usage
 
-- Weaving code-blocks together.
-- Evaluating (weaved) code blocks with your desired interpreter.
-- Writing code blocks or the output of evaluation to files.
-- Use what you know about bash to enable all kinds of features.
+```bash bash
+pod2text markatzea
+```
+```
+NAME
+    markatzea - evaluate your markdown code blocks
 
-## Requirements
+SYNOPSIS
+    colcise <file>
 
-Markatzea requires bash and some common utilities to run.
+DESCRIPTION
+    colcise is a tool which takes markdown, evaluates code blocks with
+    interpreters and prints the output of those processes to a different
+    codeblock.
+
+OPTIONS
+    -d, --option=<option-value>
+        Option description
+
+```
 
 ## Examples
+
+### Normal code-block
+
+When no interpreter is defined, markatzea will print the markdown as is.
+
+```bash
+echo 'Does not evaluate.'
+```
 
 ### Hello World
 
@@ -116,6 +136,21 @@ rm -v ./example_tmp_file
 ```
 ```
 removed './example_tmp_file'
+```
+
+### Exit on error
+
+Here we'll call markatzea and make it fail because of a code-block with
+a non-zero exit code.
+
+```bash bash
+markatzea <(echo -e '```bash bash\nexit 1\n```') > /dev/null || {
+  test "$?" -eq 1
+  exit 0
+}
+
+# Should never be reached
+exit 2
 ```
 
 ### Oneliners
