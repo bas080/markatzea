@@ -16,24 +16,10 @@ markatzea - evaluate your markdown code blocks
 
 colcise <file>
 
-=cut
-
 =head1 DESCRIPTION
 
 B<colcise> is a tool which takes markdown, evaluates code blocks with
 interpreters and prints the output of those processes to a different codeblock.
-
-=cut
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-d, --option>=<option-value>
-
-Option description
-
-=back
 
 =cut
 

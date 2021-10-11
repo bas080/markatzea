@@ -20,213 +20,48 @@ pod2text markatzea
 
 When no interpreter is defined, markatzea will print the markdown as is.
 
+    ```bash
+    echo 'Does not evaluate.'
+    ```
+
 ```bash
-echo 'Does not evaluate.'
+echo 'Does not evaluate this bash code-block'
 ```
 
-### Hello World
+### Evaluated code-block
+
+    ```bash bash
+    echo 'Does evaluate this bash code-block with bash'
+    ```
 
 ```bash bash
-echo 'hello bash'
+echo 'Does evaluate this bash code-block with bash'
 ```
 
-```python python
-print('hello python')
+### Literate Programming
+
+You can achieve a form of a literate programming using a template language that
+offers a command line interface. See [memplate][2] for more information.
+
+An example:
+
+```bash memplate sane-bash-defaults
+set -eo pipefail
 ```
 
-```js node -p
-'hello javascript'
-```
-> You can use `node -p` to print the value of the last js expression. No need to
-> write `console.log(...)`.
+Now we use the aliased template in another template.
 
-```perl perl
-print("hello perl\n")
-```
+```bash memplate | bash
+<sane-bash-defaults
 
-```lua luajit
-print("hello lua")
+ls not-a-file |
+  cat - ||
+  echo 'Good! The ls process caused the pipe to stop.'
 ```
 
-Here we have the hello world c program:
+## License
 
-```c cat - > ./hello-world.c
-#include <stdio.h>
+[GPL-3.0][1]
 
-int main() {
-   printf("Hello World!\n");
-   return 0;
-}
-```
-
-Before we can run this program we must first compile it and then we clean it
-up.
-
-```bash bash 2>&1
-gcc -o ./hello-world.out ./hello-world.c
-chmod -v +x ./hello-world.out
-./hello-world.out
-rm -v ./hello-world.*
-```
-
-You get the hello world idea. Now for some other examples.
-
-### Write code-blocks to a file
-
-We'll use `tee` for this example.
-
-```bash tee ./example_tmp_file
-temporary file contents
-```
-
-Check if the temporary file has the desired content.
-
-```bash bash
-cat ./example_tmp_file
-```
-
-Remove the temporary file.
-
-```bash bash
-rm -v ./example_tmp_file
-```
-
-### Exit on error
-
-Here we'll call markatzea and make it fail because of a code-block with
-a non-zero exit code.
-
-```bash bash
-markatzea <(echo -e '```bash bash\nexit 1\n```') > /dev/null || {
-  test "$?" -eq 1
-  exit 0
-}
-
-# Should never be reached
-exit 2
-```
-
-### Oneliners
-
-Besides defining a single interpreter, you can create all kinds of oneliners.
-
-A pipeline:
-
-```bash bash | bash
-echo 'echo pipeline'
-```
-
-```bash bash || true
-exit 1
-```
-
-> Process exits with zero because of `|| true`.
-
-```bash cat - && echo world
-hello
-```
-
-Markatzea allows you to write long oneliners which are used as the
-"interpreter". I would however advice you to keep the interpreter
-configurations as short as possible.for the sake of easy of reasoining. Ideally
-a single process. When you needs are more complex, make your own scripts and
-use those as the interpreter.
-
-### Non zero exitcode
-
-```bash bash 2>&1 || true
-print_hello_and_error() {
-  echo hello
-  some_command_that_does_not_exist
-  return 42
-}
-
-print_hello_and_error
-```
-
-> Notice that we redirect stderr to stdout. This is usefull whenever we want to
-> demo not just the stdout but also the stderr output.
-
-
-```js node 2>&1 || true
-throw new Error('Something unexpected happened.')
-```
-
-### No output
-
-```js node
-process.exit(0)
-```
-
-### Creating a script file and running it
-
-A more practical use-case could be generating a script file and running/testing
-it.
-
-```bash tee ./hello-world.sh
-#!/usr/bin/env bash
-
-echo hello world
-```
-
-```bash bash
-chmod -v +x ./hello-world.sh
-```
-
-Test if the script works as expected.
-
-```bash bash
-test "$(./hello-world.sh)" = "hello world" &&
-  echo "ok" &&
-  rm -v ./hello-world.sh
-```
-
-### Code block aliases
-
-Markatzea does not solve templating itself. We enable templating by using
-a cli templating tool named `memplate`. You can find it here: TODO
-
-We'll write a little node program to showcase using markatzea with `memplate`.
-
-First the modules the program depends on:
-
-```js memplate assert-import
-const assert = require('assert')
-```
-
-Next is a helper function:
-
-```js memplate always-fn
-const always = x => () => x
-```
-
-And finally a test.
-
-```js memplate always-fn-test
-
-const fourtyTwo = always(42)
-
-assert.equal(fourtyTwo(), 42)
-assert.equal(fourtyTwo(), 43)
-```
-
-Let's see the result
-
-```js memplate result
-<assert-import
-<always-fn
-<always-fn-test
-```
-
-```js memplate
-<result
-```
-
-We can run the program by piping the output of memplate to node.
-
-```bash memplate | node 2>&1 || true
-<result
-```
-
-By combining memplate and markatzea we can now split our code into readable
-blocks and glue them together at a later moment in time.
+[1]:./LICENSE
+[2]:https://github.com/bas080/memplate
