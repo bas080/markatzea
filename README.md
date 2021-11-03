@@ -18,10 +18,10 @@ NAME
     markatzea - evaluate your markdown code blocks
 
 SYNOPSIS
-    colcise <file>
+    markatzea <file>
 
 DESCRIPTION
-    colcise is a tool which takes markdown, evaluates code blocks with
+    markatzea is a tool which takes markdown, evaluates code blocks with
     interpreters and prints the output of those processes to a different
     codeblock.
 
