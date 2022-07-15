@@ -78,6 +78,17 @@ ls not-a-file |
 Good! The ls process caused the pipe to stop.
 ```
 
+## Projects that use markatzea
+
+> A list of projects that use markatzea.
+
+- https://github.com/bas080/markatzea
+- https://github.com/bas080/patroon
+- https://github.com/bas080/package.sh
+
+Notice that it makes it easier to maintain and test documentation by making
+usage examples runnable and thereby testable.
+
 ## License
 
 [GPL-3.0][1]
