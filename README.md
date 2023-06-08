@@ -99,6 +99,7 @@ Good! The ls process caused the pipe to stop.
 
 - https://github.com/bas080/markatzea
 - https://github.com/bas080/patroon
+- https://github.com/bas080/furver
 - https://github.com/bas080/package.sh
 
 Notice that it makes it easier to maintain and test documentation by making
