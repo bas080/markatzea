@@ -21,7 +21,7 @@ pod2text markatzea
 When no interpreter is defined, markatzea will print the markdown as is.
 
     ```bash
-    echo 'Does not evaluate.'
+    echo 'Does not evaluate this bash code-block'
     ```
 
 ```bash
@@ -36,6 +36,18 @@ echo 'Does not evaluate this bash code-block'
 
 ```bash bash
 echo 'Does evaluate this bash code-block with bash'
+```
+
+### Output Language
+
+You can define the language to use for the output code block.
+
+    ```bash|javascript bash
+    echo 'const value = 42;'
+    ```
+
+```bash|javascript bash
+echo 'const value = 42;'
 ```
 
 ### Literate Programming

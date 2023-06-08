@@ -10,7 +10,7 @@ interpreter configured for that code-block.
 
 ## Usage
 
-```bash bash
+```bash
 pod2text markatzea
 ```
 ```
@@ -34,7 +34,7 @@ DESCRIPTION
 When no interpreter is defined, markatzea will print the markdown as is.
 
     ```bash
-    echo 'Does not evaluate.'
+    echo 'Does not evaluate this bash code-block'
     ```
 
 ```bash
@@ -47,11 +47,26 @@ echo 'Does not evaluate this bash code-block'
     echo 'Does evaluate this bash code-block with bash'
     ```
 
-```bash bash
+```bash
 echo 'Does evaluate this bash code-block with bash'
 ```
 ```
 Does evaluate this bash code-block with bash
+```
+
+### Output Language
+
+You can define the language to use for the output code block.
+
+    ```bash|javascript bash
+    echo 'const value = 42;'
+    ```
+
+```bash
+echo 'const value = 42;'
+```
+```javascript
+const value = 42;
 ```
 
 ### Literate Programming
@@ -61,13 +76,13 @@ offers a command line interface. See [memplate][2] for more information.
 
 An example:
 
-```bash memplate sane-bash-defaults
+```bash
 set -eo pipefail
 ```
 
 Now we use the aliased template in another template.
 
-```bash memplate | bash
+```bash
 <sane-bash-defaults
 
 ls not-a-file |
