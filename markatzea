@@ -3,9 +3,7 @@
 use strict;
 use warnings;
 
-use Getopt::Long qw(:config auto_help);
 use IPC::Open2 qw(open2);
-use File::Temp qw(tempfile);
 
 =head1 NAME
 
@@ -23,59 +21,32 @@ interpreters and prints the output of those processes to a different codeblock.
 =cut
 
 while (my $line = <>) {
-    unless ($line =~ /^```\w*(\|\w*)? \w*/) {
+    unless ($line =~ /^```(\w+)\|?(\w+)?\s+(.+)/) {
         print $line;
         next;
     }
 
-    my ($lang, $out_lang, $command) = ($line =~ /^```(\w*)(\|\w*)? (.*)/);
-    if (defined $lang) {
-        print "```$lang\n";
-    }
+    my $lang = $1;
+    my $out_lang = $2 || ""; # Out lang is optional
+    my $command = $3;
+    my $pid = open2(my $out, my $in, $command)
+      or die "Failed to open subprocess: $!";
 
-    $out_lang = $out_lang ? substr($out_lang, 1) : "";
-
-    next unless $command;
-
-    my ($in, $out, $pid) = eval_code_block($command);
-
-    # Write to the process
+    print "```$lang\n";
     while ($line = <>) {
         print $line;
-
         last if $line =~ /^```/;
-
         print $in $line;
     }
 
     close($in);
+    next if eof $out;
 
-    print_evaluated_code_block($out, $lang, $out_lang);
+    print "```$out_lang\n";
+    print while <$out>;
+    print "```\n";
 
     waitpid($pid, 0);
     my $exit_status = $? >> 8;
     exit $exit_status if $exit_status != 0;
-}
-
-sub eval_code_block {
-    my ($command) = @_;
-
-    my $pid = open2(my ($out), my ($in), $command)
-      or die "Failed to open subprocess: $!";
-
-    return ($in, $out, $pid);
-}
-
-sub print_evaluated_code_block {
-    my ($out, $lang, $out_lang) = @_;
-
-    return if eof $out;
-
-    print "```$out_lang\n";
-
-    while (my $line = <$out>) {
-        print $line;
-    }
-
-    print "```\n";
 }
