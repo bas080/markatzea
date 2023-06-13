@@ -43,7 +43,15 @@ while (my $line = <>) {
     next if eof $out;
 
     print "```$out_lang\n";
-    print while <$out>;
+
+    while (my $line = <$out>) {
+      if ($line =~ /\n$/) {
+        print $line;
+      } else {
+        print "$line\n";
+      }
+    }
+
     print "```\n";
 
     waitpid($pid, 0);
