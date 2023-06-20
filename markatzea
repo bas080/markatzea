@@ -20,6 +20,8 @@ interpreters and prints the output of those processes to a different codeblock.
 
 =cut
 
+$| = 1;
+
 while (my $line = <>) {
     unless ($line =~ /^```(\w+)\|?(\w+)?\s+(.+)/) {
         print $line;
