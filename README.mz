@@ -1,9 +1,13 @@
 # markatzea
 
-Markatzea enhances your markdown by running your code-blocks and printing out
-the output of those commands.
+This project's `README.md` and stdout codeblocks are created using
+markatzea:
 
-It should/does not break your existing markdown. It adds a little syntax for
+```bash
+markatzea README.mz > README.md
+```
+
+Markatzea does not break your existing markdown. It adds a little syntax for
 defining the interpreter for that code block. This is defined after the
 code-block's language name. The code-block is then passed as stdin into the
 interpreter configured for that code-block.
