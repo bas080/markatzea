@@ -76,7 +76,7 @@ const value = 42;
 ### Literate Programming
 
 You can achieve a form of a literate programming using a template language that
-offers a command line interface. See [memplate][2] for more information.
+offers a command line interface. See [woven][2] for more information.
 
 An example:
 
@@ -87,7 +87,7 @@ set -eo pipefail
 Now we use the aliased template in another template.
 
 ```bash
-<sane-bash-defaults
+# < sane-bash-defaults
 
 ls not-a-file |
   cat - ||
@@ -114,4 +114,4 @@ usage examples runnable and thereby testable.
 [GPL-3.0][1]
 
 [1]:./LICENSE
-[2]:https://github.com/bas080/memplate
+[2]:https://github.com/bas080/woven
