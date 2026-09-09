@@ -1,5 +1,7 @@
 # markatzea
 
+[![Stand with Palestine](https://img.shields.io/badge/🇵🇸%20%20Stand%20With%20Palestine-007A3D?style=flat-square&color=brightgreen)](https://www.islamic-relief.org.uk/giving/appeals/palestine/)
+
 This project's `README.md` and stdout codeblocks are created using
 markatzea:
 
