@@ -29,8 +29,9 @@ while (my $line = <>) {
     my $lang = $1;
     my $out_lang = $2 || ""; # Out lang is optional
     my $command = $3;
+    my $shell = $ENV{SHELL} || '/bin/sh';
 
-    my $pid = open2(my $out, my $in, $command)
+    my $pid = open2(my $out, my $in, $shell, '-c', $command)
       or die "Failed to open subprocess: $!";
 
     print "```$lang\n";
